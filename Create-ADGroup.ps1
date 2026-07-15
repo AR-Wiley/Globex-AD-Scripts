@@ -1,3 +1,24 @@
+﻿if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "Please run this script as Administrator."
+    return 
+}
+else {
+    Write-Host "Running as Administrator."
+}
+
+function AD_Module_Installed{
+
+    if(-not(Get-Module -name ActiveDirectory )){
+        try {
+            Import-Module -Name ActiveDirectory
+            Write-Host "ActiveDirectory has been installed..."
+        }
+        catch {
+            Write-Host "Failed to Create..." -ForegroundColor Red
+        }
+    } 
+}
+
 
 function Create-Group {
 
@@ -23,3 +44,6 @@ function Create-Group {
 
 
 }
+
+AD_Module_Installed
+Create-Group
