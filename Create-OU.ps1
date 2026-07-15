@@ -41,3 +41,6 @@ function Create-OU {
         Write-Host "Failed to Create" -ForegroundColor Red 
     }
 }
+
+AD_Module_Installed
+Create-OU
