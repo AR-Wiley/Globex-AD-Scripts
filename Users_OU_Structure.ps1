@@ -7,7 +7,7 @@ else {
 }
 
 $dnPath = "DC=Globex,DC=com"
-$ouPath = "OU=Users,$dnPath"
+$ouPath = "OU=Corp Users,$dnPath"
 
 $usersOU = @("Executives", "Finance", "Advisors", "HR", "IT", "Sales")
 
@@ -27,18 +27,17 @@ function AD-Module-Installed{
 
 function Validate-Globex-DC {
     
-        if (-not(Get-ADDomain $dnPath)) {
-            Write-Host "Domain does not exist" -BackgroundColor Red -ForegroundColor Black
-            return 
-        }
-
+    if (-not (Get-ADDomain -Identity "globex.com" -ErrorAction SilentlyContinue)) {
+         Write-Host "Domain does not exist" -ForegroundColor Black -BackgroundColor Red
+         exit
+    }
 }
 
 function Validate-Users-OU {
     
-        if (-not(Get-ADOrganizationalUnit $ouPath)) {
+        if (-not(Get-ADOrganizationalUnit -Identity $ouPath)) {
             Write-Host "Parent OU does not exist" -BackgroundColor Red -ForegroundColor Black
-            return  
+            exit  
         }
 
 }
@@ -48,9 +47,9 @@ function Create-OUs {
 
     forEach($i in $usersOU) {
             
-        if (Get-ADOrganizationalUnit -Filter "$i -eq '$i'" -SearchBase $OUPath) {    
+        if (Get-ADOrganizationalUnit -Filter "Name -eq '$i'" -SearchBase $ouPath) {    
             Write-Host "Organizational Unit '$i' already exists" -ForegroundColor Yellow
-            return
+            continue
         }
     
         Try {        
@@ -59,13 +58,17 @@ function Create-OUs {
         } 
         
         Catch {
-            Write-Host "Failed to Create: $i" -ForegroundColor Red 
+            Write-Host "Failed to Create: $i Error: $_" -ForegroundColor Red 
         }   
     
     }
 
 }
 
+AD-Module-Installed
+Validate-Globex-DC
+Validate-Users-OU
+Create-OUs
 AD-Module-Installed
 Validate-Globex-DC
 Validate-Users-OU
