@@ -69,7 +69,3 @@ AD-Module-Installed
 Validate-Globex-DC
 Validate-Users-OU
 Create-OUs
-AD-Module-Installed
-Validate-Globex-DC
-Validate-Users-OU
-Create-OUs
