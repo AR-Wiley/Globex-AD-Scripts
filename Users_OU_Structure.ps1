@@ -1,4 +1,4 @@
-﻿if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Please run this script as Administrator."
     return 
 }
@@ -6,7 +6,9 @@ else {
     Write-Host "Running as Administrator."
 }
 
-$ouPath = "DC=Globex,DC=com"
+$dnPath = "DC=Globex,DC=com"
+$ouPath = "OU=Users,$dnPath"
+
 $usersOU = @("Executives", "Finance", "Advisors", "HR", "IT", "Sales")
 
 
@@ -23,12 +25,29 @@ function AD-Module-Installed{
     } 
 }
 
+function Validate-Globex-DC {
+    
+        if (-not(Get-ADDomain $dnPath)) {
+            Write-Host "Domain does not exist" -BackgroundColor Red -ForegroundColor Black
+            return 
+        }
+
+}
+
+function Validate-Users-OU {
+    
+        if (-not(Get-ADOrganizationalUnit $ouPath)) {
+            Write-Host "Parent OU does not exist" -BackgroundColor Red -ForegroundColor Black
+            return  
+        }
+
+}
+
+
 function Create-OUs {
 
-
     forEach($i in $usersOU) {
-        
-        
+            
         if (Get-ADOrganizationalUnit -Filter "$i -eq '$i'" -SearchBase $OUPath) {    
             Write-Host "Organizational Unit '$i' already exists" -ForegroundColor Yellow
             return
@@ -48,4 +67,6 @@ function Create-OUs {
 }
 
 AD-Module-Installed
+Validate-Globex-DC
+Validate-Users-OU
 Create-OUs
