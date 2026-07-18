@@ -6,7 +6,7 @@ else {
     Write-Host "Running as Administrator."
 }
 
-function AD_Module_Installed{
+function AD-Module-Installed{
 
     if(-not(Get-Module -name ActiveDirectory )){
         try {
