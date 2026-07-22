@@ -6,6 +6,8 @@ else {
     Write-Host "Running as Administrator."
 }
 
+$domain = "DC=Globex,DC=com"
+
 function AD-Module-Installed{
 
     if(-not(Get-Module -name ActiveDirectory )){
@@ -19,6 +21,13 @@ function AD-Module-Installed{
     } 
 }
 
+function Validate-Globex-DC {
+    
+    if (-not (Get-ADDomain -Identity "globex.com" -ErrorAction SilentlyContinue)) {
+         Write-Host "Domain does not exist" -ForegroundColor Black -BackgroundColor Red
+         exit
+    }
+}
 
 function Create-Group {
 
@@ -28,7 +37,7 @@ function Create-Group {
 		[ValidateSet("Global","Universal","DomainLocal")][string]$groupScope
 	)
 
-	$groupPath = "OU=$OU,DC=Globex,DC=Com"
+	$groupPath = "OU=$OU,$domain"
 
 	if (Get-ADGroup -Filter "Name -eq '$name'" -SearchBase $groupPath) {
 		Write-Host "Group $name already exists" 
@@ -42,8 +51,8 @@ function Create-Group {
 		Write-Host "Failed to create"
 	}
 
-
 }
 
-AD_Module_Installed
+AD-Module-Installed
+Validate-Globex-DC
 Create-Group
